@@ -20,6 +20,7 @@ class Freep(HTMLParser):
 	current = dict()
 	stack = []
 	comments = []
+	found_old_tweet = 0
 	
 	api = twitter.Api(consumer_key=args.consumer_key, consumer_secret=args.consumer_secret,
 	                    access_token_key=args.access_token_key, access_token_secret=args.access_token_secret,
@@ -88,9 +89,9 @@ class Freep(HTMLParser):
 		#done with this shit
 		if tag == 'html':
 			print "fuck you, got html"
-			for comment in self.comments:
-				self.do_tweet(comment)
-				
+			self.delete_existing()
+			while len(self.comments) > 0:
+				self.do_tweet(self.comments.pop())
 				
 			
 	def handle_data(self,data):
@@ -99,36 +100,53 @@ class Freep(HTMLParser):
 				index = len(self.stack) -1
 				self.stack[index]['data'] = "{0}{1}".format(self.stack[index]['data'], data)
 
+	def handle_charref(self,charcode):
+		index = len(self.stack) -1
+		if self.stack and self.stack[index]:
+			#print "got code: %s" % charcode
+			if charcode == '8217':
+				charcode = "'"
+			elif charcode == '8220':
+				charcode = '"'
+			elif charcode == '8221':
+				charcode = '"'
+			else:
+				charcode = "&{0};".format(charcode)
+			self.stack[index]['data'] = "{0}{1}".format(self.stack[index]['data'], charcode)
+	
+	
 	def do_tweet(self,dict):
 		#if the tweet is too long break it up!! assmöde
-		tweetList = []
-		
-		lines = re.findall('(.+?[\n\.\?!]+)+?',dict['comment'])
-		
+		if len(dict['comment']) > 125:
+			lines = re.findall('(.+?[\n\.\?!]+)+?',dict['comment'])
+		else:
+			lines = [dict['comment']]
+	
 		for t in lines:
 			if len(t) > 10:
 				tweet = "{0} #FR{1} :{2}".format(t,dict['thread'],dict['post']).strip()
 				if len(tweet) <= 140:
-					#print "{0} {1}".format(tweet,len(tweet))
-					if self.already_tweeted(tweet):
-						return
-						#print "already tweeted"
-					else:
 						print "tweeting %s" % tweet
 						#status = self.api.PostUpdate(tweet)
  
-	def already_tweeted(self,tweet):
-		for s in self.oldTweets:
-			#print "{0} == {1}".format(s.text,tweet)
-			if tweet == s.text:
-				return 1
-		return 0
+	def delete_existing(self):
+		mostRecentOldTweet = self.oldTweets[0].text
+		
+		index = -1
+		for i in range(len(self.comments)):
+			if mostRecentOldTweet.find(self.comments[i]['comment'])>-1:
+				index = i
+				print "found old index %s" % index
+				break
+				
+		del self.comments[index:len(self.comments)]
+
 		
 		
 		
 		
 
 
-Freep('file:///Users/me/Desktop/test.htm')
-#Freep('http://www.freerepublic.com/tag/by:dalereed/index?brevity=full;tab=comments')
+#Freep('file:///Users/me/Desktop/test.html')
+Freep('http://www.freerepublic.com/tag/by:dalereed/index?brevity=full;tab=comments')
 					
