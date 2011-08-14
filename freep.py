@@ -51,8 +51,8 @@ class Freep(HTMLParser):
 		if len(self.stack) > 0:
 			item = self.stack.pop()
 			
-			if item['tag'] != tag:
-				print "ffffffffffffffff"
+			#if item['tag'] != tag:
+				#print "ffffffffffffffff"
 			
 			if item['tag'] == 'div' and item['attrs'][0][0] == 'class' and item['attrs'][0][1] == 'text':
 				if 'comment' in self.current:
@@ -104,7 +104,7 @@ class Freep(HTMLParser):
 		index = len(self.stack) -1
 		if self.stack and self.stack[index]:
 			#print "got code: %s" % charcode
-			if charcode == '8217':
+			if charcode == '8217' or charcode == '146':
 				charcode = "'"
 			elif charcode == '8220':
 				charcode = '"'
@@ -115,7 +115,7 @@ class Freep(HTMLParser):
 			self.stack[index]['data'] = "{0}{1}".format(self.stack[index]['data'], charcode)
 	
 	
-	def do_tweet(self,dict):
+	def do_tweet(self, dict):
 		#if the tweet is too long break it up!! assmöde
 		if len(dict['comment']) > 125:
 			lines = re.findall('(.+?[\n\.\?!]+)+?',dict['comment'])
@@ -124,19 +124,24 @@ class Freep(HTMLParser):
 	
 		for t in lines:
 			if len(t) > 10:
-				tweet = "{0} #FR{1} :{2}".format(t,dict['thread'],dict['post']).strip()
-				if len(tweet) <= 140:
+				if t[0] == '"' and t[len(t)-1] == '"':
+					i = 1
+				else:
+					tweet = "{0} #FR{1} :{2}".format(t,dict['thread'],dict['post']).strip()
+					if len(tweet) <= 140:
 						print "tweeting %s" % tweet
 						#status = self.api.PostUpdate(tweet)
  
 	def delete_existing(self):
 		mostRecentOldTweet = self.oldTweets[0].text
-		
+		#print "most recent: %s" % mostRecentOldTweet[0:len(mostRecentOldTweet)-15]
+        
 		index = -1
 		for i in range(len(self.comments)):
-			if mostRecentOldTweet.find(self.comments[i]['comment'])>-1:
+			#print "checking %s" % self.comments[i]['comment']
+			if self.comments[i]['comment'].find(mostRecentOldTweet[0:len(mostRecentOldTweet)-15]) > -1:
 				index = i
-				print "found old index %s" % index
+				#print "found old index %s" % index
 				break
 				
 		del self.comments[index:len(self.comments)]
@@ -147,6 +152,6 @@ class Freep(HTMLParser):
 		
 
 
-#Freep('file:///Users/me/Desktop/test.html')
-Freep('http://www.freerepublic.com/tag/by:dalereed/index?brevity=full;tab=comments')
+Freep('file:///Users/me/Desktop/test.html')
+#Freep('http://www.freerepublic.com/tag/by:dalereed/index?brevity=full;tab=comments')
 					
