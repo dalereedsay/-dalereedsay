@@ -56,15 +56,15 @@ class Freep(HTMLParser):
 			
 			if item['tag'] == 'div' and item['attrs'][0][0] == 'class' and item['attrs'][0][1] == 'text':
 				if 'comment' in self.current:
-					self.current['comment'] = "{0} {1}".format(self.current['comment'], item['data']).strip()
-				else:
-					self.current['comment'] = item['data'].strip()
+					self.current['comment'] = []
+					
+				self.current['comment'] = item['data'].strip()
 			
 			if item['tag'] == tag == 'p':
-				if 'comment' in self.current:
-					self.current['comment'] = "{0} {1}".format(self.current['comment'], item['data']).strip()
-				else:
-					self.current['comment'] = item['data'].strip()
+				if not 'comment' in self.current:
+					self.current['comment'] = []
+					
+				self.current['comment'].append(item['data'].strip())
 					
 
 					
@@ -89,7 +89,7 @@ class Freep(HTMLParser):
 		#done with this shit
 		if tag == 'html':
 			print "fuck you, got html"
-			self.delete_existing()
+			#self.delete_existing()
 			while len(self.comments) > 0:
 				self.do_tweet(self.comments.pop())
 				
