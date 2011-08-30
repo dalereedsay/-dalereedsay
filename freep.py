@@ -11,8 +11,8 @@ class Freep(HTMLParser):
 	comments = []
 	mostRecent = None
 	
-	url = 'file:///Users/me/Desktop/test.html'
-	#url = 'http://www.freerepublic.com/tag/by:{0}/index?brevity=full;tab=comments'
+	#url = 'file:///Users/me/Desktop/test.html'
+	url = 'http://www.freerepublic.com/tag/by:{0}/index?brevity=full;tab=comments'
 	
 
 	def __init__(self, account, mostRecent):
