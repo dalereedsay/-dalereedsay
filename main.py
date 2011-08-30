@@ -1,18 +1,16 @@
 from tweeter import Tweeter
 from freep import Freep
-import argparse
-
-#why are there so many of these whoever thought of this should be executed!!!!!
-parser = argparse.ArgumentParser()
-parser.add_argument('--consumer_key')
-parser.add_argument('--consumer_secret')
-parser.add_argument('--access_token_key')
-parser.add_argument('--access_token_secret')
-args = parser.parse_args()
+from keys import Keys
 
 
-tweeter = Tweeter(args)
-freep = Freep(tweeter)
+dalereedsay = Tweeter('dalereedsay',Keys.dalereedsay())
+dalereed = Freep('dalereed', dalereedsay.mostRecent())
+dalereedsay.postList(dalereed.newComments())
+#dalereedsay.postList(dalereed.newMentions())
 
-newComments = freep.newComments()
-tweeter.postList(newComments)
+jimrobsay = Tweeter('jimrobsay', Keys.jimrobsay())
+jimrob = Freep('jimrobinson', jimrobsay.mostRecent())
+jimrobsay.postList(jimrob.newComments())
+#jimrobsay.postList(jimrob.newMentions())
+
+

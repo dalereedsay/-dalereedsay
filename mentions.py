@@ -5,26 +5,24 @@ from urllib2 import urlopen
 import re
 
 
-class Freep(HTMLParser):
+class Mentions(HTMLParser):
 	current = dict()
 	tagStack = []
 	comments = []
-	mostRecent = None
+	item = None
+	tweeter = None
 	
-	url = 'file:///Users/me/Desktop/test.html'
-	#url = 'http://www.freerepublic.com/tag/by:{0}/index?brevity=full;tab=comments'
+	#url = 'file:///Users/me/Desktop/test.html'
+	url = 'http://www.freerepublic.com/focus/news/{0}/posts?page={1}#{1}'
 	
 
-	def __init__(self, account, mostRecent):
+	def __init__(self, item):
 		HTMLParser.__init__(self)
 		self.data = list()
-		self.url = self.url.format(account)
-		req = urlopen(self.url)
-		self.mostRecent = mostRecent
-		try:
-			self.feed(req.read())
-		except AssertionError:
-			print "found old, skipping rest"
+		self.item = item
+		
+		req = urlopen(self.url.format(item['list'][0], item['list'][1]))
+		self.feed(req.read())
 
 
 	def handle_starttag(self, tag, attrs):
@@ -107,7 +105,7 @@ class Freep(HTMLParser):
 	
 	
 	def check_current(self):
-		mr = self.mostRecent
+		mr = self.tweeter.mostRecent()
 		#print "{0} == {1}".format(mr, self.current['comment'][0])
 		t = self.current['thread']
 		p = self.current['post']
