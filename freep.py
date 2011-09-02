@@ -18,6 +18,9 @@ class Freep(HTMLParser):
 	def __init__(self, account, mostRecent):
 		HTMLParser.__init__(self)
 		self.data = list()
+		self.current = dict()
+		self.tagStack = []
+		self.comments = []
 		self.url = self.url.format(account)
 		req = urlopen(self.url)
 		self.mostRecent = mostRecent

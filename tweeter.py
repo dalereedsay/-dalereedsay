@@ -1,7 +1,7 @@
 # coding: utf-8
 import twitter
-import argparse
 import re
+import sys
 
 
 
@@ -18,10 +18,11 @@ class Tweeter:
 			                    access_token_key=keys['access_token_key'], access_token_secret=keys['access_token_secret'],
 			                    input_encoding=None)
 			self.account = account
-			self.oldTweets = self.api.GetUserTimeline(self.account)
+			self.oldTweets = self.api.GetUserTimeline(self.account, 1, None)
+			#print "oldtweets {0}:{1}".format(account, self.oldTweets[0])
 			self.valid = True
 		except:
-			print "twitter api error"
+			print "twitter api error:", sys.exc_info()[0]
 			self.valid = False
 			
 	def getMentions(self):
@@ -53,6 +54,7 @@ class Tweeter:
 		
 	def mostRecent(self):
 		if self.valid:
+			print "{0} most recent: {1}".format(self.account, self.oldTweets[0].text)
 			return self.oldTweets[0].text
 		else:
 			print self.oldTweets[0].text
@@ -68,7 +70,7 @@ class Tweeter:
 		
 		build_tweet = ''
 		for t in lines:
-			if len(t) < 5:
+			if len(t) == 0:
 				continue
 				
 			if t[0] == '"' and t[len(t)-1] == '"':
