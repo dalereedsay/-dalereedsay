@@ -77,6 +77,19 @@ class Tweeter:
 				#skippin quotes
 				continue
 				
+	 		e = re.compile('thank you', re.I)
+			if e.search(t):
+				#skip jimrob's annoying thanks for the donation
+				#print "skipping ", t
+				continue
+				
+	 		e = re.compile('woo hoo', re.I)
+			if e.search(t):
+				#skip jimrob's annoying thanks for the donation
+				#print "skipping ", t
+				continue				
+				
+				
 			if len(build_tweet) + len(t) < 125:
 				build_tweet = "{0} {1}".format(build_tweet,t)
 				
@@ -90,6 +103,6 @@ class Tweeter:
 	def send_tweet(self,text,thread,post):
 		if len(text) > 2 and len(text) < 125:
 			build_tweet = "{0} #FR{1} :{2}".format(text,thread,post).strip()
-			print "({0}) tweeting [ {1} ]".format(self.account,build_tweet)
+			print "{0}: [ {1} ]".format(self.account,build_tweet)
 			status = self.api.PostUpdate(build_tweet)
 
